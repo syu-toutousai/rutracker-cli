@@ -1,50 +1,30 @@
 ```
    ___      _               _                      _ _
-  | _ \_  |_   _| _ __ _ __| |_____ _ _   ___   __| (_)
+  | _ \_  _| |_ _ _ __ _ __| |_____ _ _   ___   __| (_)
   |   / || |  _| '_/ _` / _| / / -_) '_| |___| / _| | |
-  |_|_\\_,_||_||_| \__,_\__|_\_\___|_|         \__|_|_|
+  |_|_\\_,_|\__|_| \__,_\__|_\_\___|_|         \__|_|_|
 
 ```
 
-# rutracker-cli (Modernized & Fixed)
+# rutracker-cli
 
-Node.js command line interface to RuTracker for downloading `.torrent` files. 
+Node.js CLI for interacting with RuTracker. Built for downloading `.torrent` files directly from the terminal.
 
-This is a maintained fork that fixes the critical "Authentication failed" issues and adds features for non-Russian speakers.
+This fork fixes the long-standing "Authentication failed" errors and integrates real-time English translation for better accessibility.
 
 ![demo.gif](https://raw.githubusercontent.com/kuzzmi/rutracker-cli/master/public/demo.gif)
 
-# Features
-0. **Fixed Authentication**: Fully working login flow using modern HTTPS and session management.
-1. **English Translation**: Automatically translates search result categories and titles from Russian to English.
-2. **Multiple Downloads**: Download one or multiple .torrent files in one go.
-3. **Session Persistence**: Saves authentication data locally for seamless subsequent uses.
-4. **Sorted Results**: Search results are automatically sorted by size and seeder count.
-5. **Color Coded Stats**: Instant visual feedback on torrent health (Seeders/Leechers).
-6. **Semi-interactive Mode**: Support for CLI arguments (username, password, query).
+## Why this fork?
 
-# Recent Improvements (2026)
-*   **Security**: Switched all API calls to mandatory HTTPS.
-*   **Compatibility**: Added browser-mimicking `User-Agent` headers to prevent server blocks.
-*   **Stability**: Inlined and fixed the core `rutracker-api` logic to resolve dependency abandonment.
-*   **Cleanup**: Removed failing native dependencies (`dbus`) to ensure smooth installation on modern Node.js versions.
+The original project was abandoned and stopped working due to changes in RuTracker's security (mandatory HTTPS, User-Agent filtering, and session cookie requirements). This version:
+*   **Fixes Auth**: Modernized login flow that actually works.
+*   **Translates Results**: Automatically converts Russian titles/categories to English via Google Translate API.
+*   **Zero Bloat**: Removed broken native dependencies (`dbus`) for a smoother install.
+*   **Inlined Logic**: Bundles a fixed version of the unmaintained `rutracker-api`.
 
-# Configuration
+## Installation
 
-The tool creates a default configuration file at:
-`~/.config/rutracker-cli/config.json`
-
-```json
-{
-	"downloadPath": "/home/%user%/Torrents",
-	"username": "your_username",
-	"password": "your_password"
-}
-```
-
-# Installation
-
-To run this version, clone the repository and link it locally:
+Clone and link it to your path:
 
 ```bash
 git clone https://github.com/syu-toutousai/rutracker-cli.git
@@ -53,25 +33,40 @@ npm install
 sudo npm link
 ```
 
-# Usage
+## Usage
 
-### Interactive Mode
+### Search for open-source mirrors (e.g., AOSP, Linux distros)
+```bash
+rutracker-cli -q "AOSP"
+```
+
+### Provide credentials via flags
+```bash
+rutracker-cli -u your_username -p your_password -q "LineageOS"
+```
+
+### Interactive mode
+Just run it without arguments to enter the interactive prompt:
 ```bash
 rutracker-cli
 ```
 
-### Search Immediately
-```bash
-rutracker-cli -q "Interstellar"
-# or
-rutracker-cli --query="Interstellar"
+## Config
+Your credentials and download path are stored at `~/.config/rutracker-cli/config.json`.
+
+```json
+{
+	"downloadPath": "/home/user/Torrents",
+	"username": "user",
+	"password": "password"
+}
 ```
 
-### Provide Credentials via CLI
+## Workflow Tip: aria2
+Chain it with `aria2c` for a full terminal-based download workflow:
 ```bash
-rutracker-cli -u my_user -p my_password -q "Search Query"
+rutracker-cli -q "Arch Linux" && aria2c *.torrent
 ```
 
-# Contributions
-
-Feel free to open issues or pull requests on this fork!
+## Contribution
+Hack away. PRs are welcome on this fork.
