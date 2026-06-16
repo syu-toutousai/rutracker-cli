@@ -3,6 +3,7 @@
 require('clear')();
 
 const RutrackerApi = require('./lib/rutracker-api');
+const translate = require('translate-google-api');
 const minimist = require('minimist');
 const inquirer = require('inquirer');
 const fs = require('fs');
@@ -222,6 +223,40 @@ function search(query) {
     });
 }
 
+async function translateResults(data) {
+    const loader = new Spinner('Translating results...');
+    loader.start();
+
+    try {
+        const titles = data.map(t => deHtml(t.title));
+        const categories = [...new Set(data.map(t => deHtml(t.category)))];
+
+        const [translatedTitles, translatedCategories] = await Promise.all([
+            translate(titles, { to: 'en' }),
+            translate(categories, { to: 'en' })
+        ]);
+
+        if (!translatedTitles || !translatedCategories) {
+            throw new Error('Translation returned empty results');
+        }
+
+        const categoryMap = categories.reduce((map, cat, i) => {
+            map[cat] = translatedCategories[i];
+            return map;
+        }, {});
+
+        data.forEach((t, i) => {
+            t.title = translatedTitles[i];
+            t.category = categoryMap[deHtml(t.category)];
+        });
+    } catch (err) {
+        console.error('\nTranslation failed:', err.message);
+    } finally {
+        loader.stop();
+    }
+    return data;
+}
+
 function login({ skip = false }) {
     return function({ username, password }) {
         return new Promise((resolve, reject) => {
@@ -312,6 +347,7 @@ const app = options => {
         .then(login({ skip: skipAuth }))
         .then(() => getQuery(query))
         .then(search)
+        .then(translateResults)
         .then(processSearch)
         .then(repeatSearch)
         .then(toRepeat => {
