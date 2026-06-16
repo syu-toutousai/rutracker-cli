@@ -2,7 +2,7 @@
 
 require('clear')();
 
-const RutrackerApi = require('rutracker-api');
+const RutrackerApi = require('./lib/rutracker-api');
 const minimist = require('minimist');
 const inquirer = require('inquirer');
 const fs = require('fs');
